@@ -4,9 +4,200 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>MovieApi Documentation</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <h1>This is the documentation page</h1>
+    <header class="container">
+      <h2>Movie Api Documentation</h2>
+      <p>Get details for your for your movie applications</p>
+    </header>
+
+    <section class="container">
+      <h2>API Endpoints</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr class="thead-dark">
+            <th scope="col">Description (Logic)</th>
+            <th scope="col">Endpoint URL</th>
+            <th scope="col">HTTP Method</th>
+            <th scope="col">Query Parameters</th>
+            <th scope="col">Request Format</th>
+            <th scope="col">Response Format</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>All Movies</td>
+            <td>/movies</td>
+            <td>GET</td>
+            <td>/movies</td>
+            <td>None</td>
+            <td>A JSON object holding data about all movies</td>
+          </tr>
+          <tr>
+            <td>Details of single movies (Selected by Title)</td>
+            <td>/movies/[title]</td>
+            <td>GET</td>
+            <td>movies/:title</td>
+            <td>None</td>
+            <td>
+              A JSON object holding data about a single movie, containing a
+              description, genre, director, image URL, whether it’s featured or
+              not. <br />
+              Example: <br />
+              { "id":1 <br />
+              "title":" The Shawshank Redemption", <br />
+              " year": 1994, <br />
+              "director": "Frank Darabont", <br />
+              "duration": "2h 22min", <br />
+              "genre:" ["Crime", "Drama"], }
+            </td>
+          </tr>
+          <tr>
+            <td>Return data about a genre (description) by title</td>
+            <td>/genres/[name]</td>
+            <td>GET</td>
+            <td>genres/:name</td>
+            <td>None</td>
+            <td>
+              A JSON object holding data about a genre. <br />
+              Example: <br />
+              { <br />
+              "genre:"Crime" <br />
+              "Description:"film genre inspired by and analogous to the crime
+              fiction literary genre ..." <br />
+              }
+            </td>
+          </tr>
+          <tr>
+            <td>Return data about a director</td>
+            <td>/directors/[name]</td>
+            <td>GET</td>
+            <td>directors/:name</td>
+            <td>None</td>
+            <td>
+              A JSON object holding data about a director <br />
+              Example: <br />
+              { <br />
+              "name": "Frank Darabont", <br />
+              "Bio": "is a French-American film director, screenwriter and
+              producer ...", <br />
+              "DOB": "January 28, 1959", <br />
+              }
+            </td>
+          </tr>
+          <tr>
+            <td>Allow new Users to register</td>
+            <td>/users</td>
+            <td>POST</td>
+            <td>/users</td>
+            <td>
+              A JSON object holding data about new User to be registered.
+              <br />
+              For Example <br />
+              { <br />
+              "user": "Paulina Gomez", <br />
+              "email": "paulina@gmail.com", <br />
+              "password": "Paulina1990", <br />
+              "DOB": "October 24, 1990", <br />
+              }
+            </td>
+            <td>
+              A JSON object holding data about registered new User with ID.
+              <br />
+              For Example <br />
+              { <br />
+              "id": 2, <br />
+              "user": "Paulina Gomez", <br />
+              "email": "paulina@gmail.com", <br />
+              "password": "Paulina1990", <br />
+              "DOB": "October 24, 1990", <br />
+              }
+            </td>
+          </tr>
+          <tr>
+            <td>Allow Users to update info</td>
+            <td>/users/[username]</td>
+            <td>PUT</td>
+            <td>/users/:username</td>
+            <td>
+              A JSON object holding data about Users update. <br />
+              For Example <br />
+              { <br />
+              "user": "Paulina Gomez", <br />
+              "email": "paulina@gmail.com", <br />
+              "password": "Paulina1991", <br />
+              "DOB": "October 24, 1991", <br />
+              }
+            </td>
+            <td>
+              A JSON object holding data about User's updated info with ID.
+              <br />
+              For Example <br />
+              { <br />
+              "id": 2, <br />
+              "user": "Paulina Gomez", <br />
+              "email": "paulina@gmail.com", <br />
+              "password": "Paulina1991", <br />
+              "DOB": "October 24, 1991", <br />
+              }
+            </td>
+          </tr>
+          <tr>
+            <td>Allow users to add movie to favorite list</td>
+            <td>/users/[username]/favorites/[movieID]</td>
+            <td>POST</td>
+            <td>/users/:username/:favorites/:movieID</td>
+            <td>None</td>
+            <td>
+              A text message indicating that movie has been added to favorite
+              list
+            </td>
+          </tr>
+          <tr>
+            <td>Allow users to remove movie from favorite list</td>
+            <td>/users/[username]/removefavorites/[movieID]</td>
+            <td>DELETE</td>
+            <td>/users/:username/:removefavorites/:movieID</td>
+            <td>None</td>
+            <td>
+              A text message indicating that movie has been removed from
+              favorite list
+            </td>
+          </tr>
+          <tr>
+            <td>Allow existing users to deregister</td>
+            <td>/users/[username]</td>
+            <td>DELETE</td>
+            <td>/users/:username</td>
+            <td>None</td>
+            <td>Message indicating that a user email has been removeds</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
