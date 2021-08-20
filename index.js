@@ -1,85 +1,26 @@
 const express = require('express');
-const app = express();
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
-const port = 8080;
-
-let topMovies = [
-  {
-    title: 'The Shawshank Redemption',
-    year: 1994,
-    director: 'Frank Darabont',
-    duration: '2h 22min',
-    genre: ['Crime', 'Drama'],
-  },
-  {
-    title: 'The Godfather',
-    year: 1972,
-    director: 'Francis Ford Coppola',
-    duration: '2h 55min',
-    genre: ['Crime', 'Drama'],
-  },
-  {
-    title: 'The Godfather: Part II',
-    year: 1974,
-    director: 'Francis Ford Coppola',
-    duration: '3h 22min',
-    genre: ['Crime', 'Drama'],
-  },
-  {
-    title: 'The Dark Knight',
-    year: 2008,
-    director: 'Christopher Nolan',
-    duration: '2h 32min',
-    genre: ['Action', 'Crime', 'Drama', 'Thriller'],
-  },
-  {
-    title: '12 Angry Men',
-    year: 1957,
-    director: 'Sidney Lumet',
-    duration: '1h 36min',
-    genre: ['Crime', 'Drama'],
-  },
-  {
-    title: 'Schindler"s List',
-    year: 1993,
-    director: 'Steven Spielberg',
-    duration: '3h 15min',
-    genre: ['Biography', 'Drama', 'History'],
-  },
-  {
-    title: 'Pulp Fiction',
-    year: 1994,
-    director: 'Quentin Tarantino',
-    duration: '2h 34min',
-    genre: ['Crime', 'Drama'],
-  },
-  {
-    title: 'The Lord of the Rings: The Return of the King',
-    year: 2003,
-    director: 'Peter Jackson',
-    duration: '3h 21min',
-    genre: ['Adventure', 'Drama', 'Fantasy'],
-  },
-  {
-    title: 'Il buono, il brutto, il cattivo',
-    year: 1966,
-    director: 'Sergio Leone',
-    duration: '3h 2min',
-    genre: ['Western'],
-  },
-  {
-    title: 'Fight Club',
-    year: 1999,
-    director: 'David Fincher',
-    duration: '2h 19min',
-    genre: ['Drama'],
-  },
-];
+const morgan = require('morgan');
+const app = express();
+const mongoose = require('mongoose');
+//Schema file
+const Models = require('./model.js');
+//Schemas
+const Movies = Models.Movie;
+const Users = Models.User;
 
 //bodyParser Middleware for req.param.body
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const port = 8080;
+
+//Connnect to MongoDB shell
+mongoose.connect('mongodb://localhost:27017/movieApp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 //morgan middleware to log details
 app.use(morgan('common'));
@@ -87,33 +28,101 @@ app.use(morgan('common'));
 //static routes
 app.use(express.static('public'));
 
+//Home directory
+app.get('/', (req, res) => {
+  res.send('<h1>welcome to MovieApi</h1>');
+});
+
 //All movies route
 app.get('/movies', (req, res) => {
-  res.json(topMovies);
+  Movies.find()
+    .then((movies) => {
+      res.status(201).json(movies);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
 //route to Data about single movie route
-app.get('/movies/:title', (req, res) => {
-  res.send(
-    topMovies.find((movie) => {
-      return movie.title === req.params.title;
+app.get('/movies/:Title', (req, res) => {
+  Movies.findOne({ Title: req.params.Title })
+    .then((movie) => {
+      res.json(movie);
     })
-  );
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
-//Route to Data about Genre
-app.get('/genres/:name', (req, res) => {
-  res.send('<h1>This is the genre Route </h1>');
+//Route to Data about Genre                            ******
+app.get('/movies/:genres', (req, res) => {
+  Movies.find({ genres: req.params.Genre })
+    .then((movie) => {
+      res.json(movie);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
-
 //Route to Data about Director
 app.get('/directors/:name', (req, res) => {
   res.send('<h1>This is the info Route about Director </h1>');
 });
 
+//get all users
+app.get('/users', (req, res) => {
+  Users.find()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+// Get a user by username
+app.get('/users/:Username', (req, res) => {
+  Users.findOne({ username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
 //Route to register new users
 app.post('/users', (req, res) => {
-  res.send('<h1>This is the Route to Register new Users</h1>');
+  Users.findOne({ username: req.body.username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.username + 'already exists');
+      } else {
+        Users.create({
+          username: req.body.username,
+          password: req.body.password,
+          email: req.body.email,
+          birthday: req.body.birthday,
+        })
+          .then((user) => {
+            res.status(201).json(user);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    });
 });
 
 //Route to Update users info
