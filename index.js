@@ -9,6 +9,8 @@ const Models = require('./model.js');
 //Schemas
 const Movies = Models.Movie;
 const Users = Models.User;
+const Genres = Models.Genre;
+const Directors = Models.Director;
 
 //bodyParser Middleware for req.param.body
 app.use(bodyParser.json());
@@ -20,6 +22,7 @@ const port = 8080;
 mongoose.connect('mongodb://localhost:27017/movieApp', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 
 //morgan middleware to log details
@@ -57,9 +60,9 @@ app.get('/movies/:Title', (req, res) => {
     });
 });
 
-//Route to Data about Genre                            ******
-app.get('/movies/:genres', (req, res) => {
-  Movies.find({ genres: req.params.Genre })
+//Route to Data about Genre
+app.get('/genres/:genre', (req, res) => {
+  Genres.find({ genre: req.params.genre })
     .then((movie) => {
       res.json(movie);
     })
@@ -68,9 +71,15 @@ app.get('/movies/:genres', (req, res) => {
       res.status(500).send('Error: ' + err);
     });
 });
+
 //Route to Data about Director
-app.get('/directors/:name', (req, res) => {
-  res.send('<h1>This is the info Route about Director </h1>');
+app.get('/directors/:Name', async (req, res) => {
+  try {
+    const director = await Directors.findOne({ Name: req.params.Name });
+    res.json(director);
+  } catch (err) {
+    res.json({ message: 'Info about director could not be accessed' });
+  }
 });
 
 //get all users
@@ -86,15 +95,13 @@ app.get('/users', (req, res) => {
 });
 
 // Get a user by username
-app.get('/users/:Username', (req, res) => {
-  Users.findOne({ username: req.params.Username })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
+app.get('/users/:Username', async (req, res) => {
+  try {
+    const user = await Users.findOne({ username: req.params.Username });
+    res.json(user);
+  } catch (err) {
+    res.json({ message: 'User could not be accessed by username' });
+  }
 });
 
 //Route to register new users
@@ -125,24 +132,67 @@ app.post('/users', (req, res) => {
     });
 });
 
-//Route to Update users info
-app.put('/users/:username', (req, res) => {
-  res.send('<h1>This is the Route to Update user info</h1>');
+//Updating User Info
+app.patch('/users/:postid', async (req, res) => {
+  try {
+    const patchedPost = await Users.updateOne(
+      { _id: req.params.postid },
+      { $set: { username: req.body.username } }
+    );
+    res.json(patchedPost);
+  } catch (err) {
+    res.send({ message: err });
+  }
 });
 
 //Route for users to add movies to favorite list
-app.post('/users/:username/:favorites/:movieID', (req, res) => {
-  res.send('<h1>This is the Route to add movie to favorite list</h1>');
+app.post('/users/:Username/movies/:MovieID', (req, res) => {
+  Users.findOneAndUpdate(
+    { username: req.params.Username },
+    {
+      $push: { favoriteMovie: req.params.MovieID },
+    },
+    { new: true },
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+      } else {
+        res.json(updatedUser);
+      }
+    }
+  );
 });
 
 //Route for users to remove movies from favorite list
-app.delete('/users/:username/:favorites/:movieID', (req, res) => {
-  res.send('<h1>This is the Route to remove movie from favorite list</h1>');
+app.delete('/users/:Username/movies/delete/:MovieID', (req, res) => {
+  Users.findOneAndUpdate(
+    { username: req.params.Username },
+    {
+      $pull: { favoriteMovie: req.params.MovieID },
+    },
+    { new: true },
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+      } else {
+        res.json(updatedUser);
+      }
+    }
+  );
 });
 
 //Route to delete user
-app.delete('/users/:username', (req, res) => {
-  res.send('<h1>This is the Route to delete user</h1>');
+app.delete('/users/:username', async (req, res) => {
+  try {
+    const deletedUser = await Users.findOneAndRemove({
+      username: req.params.username,
+    });
+    res.json(deletedUser);
+  } catch (err) {
+    res.json({ message: 'User could not be deleted' });
+  }
 });
 
 //Error handling
