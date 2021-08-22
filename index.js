@@ -22,7 +22,6 @@ const port = 8080;
 mongoose.connect('mongodb://localhost:27017/movieApp', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useFindAndModify: false,
 });
 
 //morgan middleware to log details
@@ -37,32 +36,28 @@ app.get('/', (req, res) => {
 });
 
 //All movies route
-app.get('/movies', (req, res) => {
-  Movies.find()
-    .then((movies) => {
-      res.status(201).json(movies);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
+app.get('/movies', async (req, res) => {
+  try {
+    const movies = await Movies.find();
+    res.status(201).json(movies);
+  } catch (err) {
+    res.json({ message: 'Movies could not be accessed' });
+  }
 });
 
 //route to Data about single movie route
-app.get('/movies/:Title', (req, res) => {
-  Movies.findOne({ Title: req.params.Title })
-    .then((movie) => {
-      res.json(movie);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
+app.get('/movies/:Title', async (req, res) => {
+  try {
+    const movie = await Movies.findOne({ Title: req.params.Title });
+    res.status(201).json(movie);
+  } catch (err) {
+    res.json({ message: 'Movie could not be accessed' });
+  }
 });
 
-//Route to Data about Genre
+//Route to Data about Genre  ****************************************
 app.get('/genres/:genre', (req, res) => {
-  Genres.find({ genre: req.params.genre })
+  Movies.find({ Genre: req.body.genre })
     .then((movie) => {
       res.json(movie);
     })
@@ -72,10 +67,10 @@ app.get('/genres/:genre', (req, res) => {
     });
 });
 
-//Route to Data about Director
+//Route to Data about Director  **************************************
 app.get('/directors/:Name', async (req, res) => {
   try {
-    const director = await Directors.findOne({ Name: req.params.Name });
+    const director = await Movies.findOne({ Name: req.params.Name });
     res.json(director);
   } catch (err) {
     res.json({ message: 'Info about director could not be accessed' });
@@ -83,15 +78,13 @@ app.get('/directors/:Name', async (req, res) => {
 });
 
 //get all users
-app.get('/users', (req, res) => {
-  Users.find()
-    .then((users) => {
-      res.status(201).json(users);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
+app.get('/users', async (req, res) => {
+  try {
+    const users = await Users.find();
+    res.status(201).json(users);
+  } catch (err) {
+    res.json({ message: 'Users could not be accessed' });
+  }
 });
 
 // Get a user by username
