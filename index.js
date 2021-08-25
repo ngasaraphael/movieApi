@@ -26,16 +26,15 @@ const auth = require('./auth');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Connnect to MongoDB
+//Connect to MongoDB Atlass
 mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
+//Connnect to MongoDB shell
 // dotenv.config();
-// (initial connect) DB_CONNECT = mongodb+srv://ngasaraphael:dudumimi79@contactkeeper.582hb.mongodb.net/movieApp?retryWrites=true&w=majority
-//mongodb://localhost:27017/movieApp (connectionto sheel)
-// mongoose.connect(process.env.DB_CONNECT, {
+// mongoose.connect('mongodb://localhost:27017/movieApp', {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true,
 // });
