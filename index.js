@@ -1,5 +1,9 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+app.use(cors());
+const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
 const dotenv = require('dotenv');
@@ -21,8 +25,6 @@ const auth = require('./auth');
 //bodyParser Middleware for req.param.body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const port = 8080;
 
 //Connnect to MongoDB shell
 dotenv.config();
@@ -108,32 +110,46 @@ app.get('/users/:Username', verify, async (req, res) => {
 });
 
 //Route to register new users
-app.post('/users', verify, (req, res) => {
-  Users.findOne({ username: req.body.username })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.username + 'already exists');
-      } else {
-        Users.create({
-          username: req.body.username,
-          password: req.body.password,
-          email: req.body.email,
-          birthday: req.body.birthday,
-        })
-          .then((user) => {
-            res.status(201).json(user);
-          })
-          .catch((error) => {
-            console.error(error);
-            res.status(500).send('Error: ' + error);
-          });
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
+app.post(
+  '/users',
+  [
+    check('password', 'Password is required').not().isEmpty(),
+    check('email', 'Email does not appear to be valid').isEmail(),
+  ],
+
+  async (req, res) => {
+    // check the validation object for errors (express validator)
+    let errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    //Check is user already exist
+    const emailExist = await Users.findOne({ email: req.body.email });
+    if (emailExist) {
+      return res.status(400).send('User already exist');
+    }
+
+    //Hash password with bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    //register new user
+    const user = new Users({
+      username: req.body.username,
+      email: req.body.email,
+      password: hashedPassword,
+      birthday: req.body.birthday,
     });
-});
+    try {
+      const savedUser = await user.save();
+      res.send(savedUser);
+    } catch (err) {
+      // res.status(400).send(err);
+    }
+  }
+);
 
 //Updating User Info
 app.patch('/users/:postid', verify, async (req, res) => {
@@ -205,6 +221,7 @@ app.use((err, req, res, next) => {
 });
 
 //port
-app.listen(port, () => {
-  console.log(`App is running on port: ${port}`);
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+  console.log('Listening on Port ' + port);
 });
