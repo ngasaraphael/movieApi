@@ -26,8 +26,7 @@ const auth = require('./auth');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Connnect to MongoDB shell
-
+//Connnect to MongoDB
 mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -56,7 +55,7 @@ app.get('/', (req, res) => {
 });
 
 //All movies route
-app.get('/movies', async (req, res) => {
+app.get('/movies', verify, async (req, res) => {
   try {
     const movies = await Movies.find();
     res.status(201).json(movies);
@@ -66,7 +65,7 @@ app.get('/movies', async (req, res) => {
 });
 
 //route to Data about single movie route
-app.get('/movies/:Title', async (req, res) => {
+app.get('/movies/:Title', verify, async (req, res) => {
   try {
     const movie = await Movies.findOne({ Title: req.params.Title });
     res.status(201).json(movie);
@@ -98,7 +97,7 @@ app.get('/directors/:Name', async (req, res) => {
 });
 
 //get all users
-app.get('/users', async (req, res) => {
+app.get('/users', verify, async (req, res) => {
   try {
     const users = await Users.find();
     res.status(201).json(users);
@@ -108,7 +107,7 @@ app.get('/users', async (req, res) => {
 });
 
 // Get a user by username
-app.get('/users/:Username', async (req, res) => {
+app.get('/users/:Username', verify, async (req, res) => {
   try {
     const user = await Users.findOne({ username: req.params.Username });
     res.json(user);
@@ -160,7 +159,7 @@ app.post(
 );
 
 //Updating User Info
-app.patch('/users/:postid', async (req, res) => {
+app.patch('/users/:postid', verify, async (req, res) => {
   try {
     const patchedPost = await Users.updateOne(
       { _id: req.params.postid },
@@ -173,7 +172,7 @@ app.patch('/users/:postid', async (req, res) => {
 });
 
 //Route for users to add movies to favorite list
-app.post('/users/:Username/movies/:MovieID', (req, res) => {
+app.post('/users/:Username/movies/:MovieID', verify, (req, res) => {
   Users.findOneAndUpdate(
     { username: req.params.Username },
     {
@@ -192,7 +191,7 @@ app.post('/users/:Username/movies/:MovieID', (req, res) => {
 });
 
 //Route for users to remove movies from favorite list
-app.delete('/users/:Username/movies/delete/:MovieID', (req, res) => {
+app.delete('/users/:Username/movies/delete/:MovieID', verify, (req, res) => {
   Users.findOneAndUpdate(
     { username: req.params.Username },
     {
