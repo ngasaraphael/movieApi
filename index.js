@@ -6,7 +6,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 //passport
