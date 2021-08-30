@@ -158,7 +158,7 @@ app.post(
 );
 
 //Updating User Info
-app.patch('/users/:postid', async (req, res) => {
+app.patch('/users/:postid', verify, async (req, res) => {
   try {
     const patchedPost = await Users.updateOne(
       { _id: req.params.postid },
@@ -190,7 +190,7 @@ app.post('/users/:Username/movies/:MovieID', (req, res) => {
 });
 
 //Route for users to remove movies from favorite list
-app.delete('/users/:Username/movies/delete/:MovieID', (req, res) => {
+app.delete('/users/:Username/movies/delete/:MovieID', verify, (req, res) => {
   Users.findOneAndUpdate(
     { username: req.params.Username },
     {
