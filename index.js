@@ -27,17 +27,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //Connect to MongoDB Atlass
-// mongoose.connect(process.env.CONNECTION_URI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
-
-//Connnect to MongoDB shell
-dotenv.config();
-mongoose.connect('mongodb://localhost:27017/movieApp', {
+mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+//Connnect to MongoDB shell
+// dotenv.config();
+// mongoose.connect('mongodb://localhost:27017/movieApp', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
 
 //morgan middleware to log details
 app.use(morgan('common'));
