@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const Users = model.User;
 
 //LOGIN
-router.post('login', async (req, res) => {
+router.post('/login', async (req, res) => {
   //Checking if email exist in db
   const user = await Users.findOne({ email: req.body.email });
   if (!user) return res.status(400).send('Invalid Email or Password');

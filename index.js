@@ -43,7 +43,7 @@ mongoose.connect(process.env.CONNECTION_URI, {
 app.use(morgan('common'));
 
 //route middleware
-app.use('/', auth);
+app.use('/user', auth);
 
 //static routes
 app.use(express.static('public'));
