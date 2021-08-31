@@ -4,7 +4,6 @@ const app = express();
 
 //implemeting cors
 //Allowed Origins by Cors//
-
 let allowedOrigins = [
   'http://localhost:8081',
   'https://nameless-retreat-07686.herokuapp.com/',
