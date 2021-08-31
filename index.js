@@ -1,7 +1,30 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-app.use(cors());
+
+//implemeting cors
+//Allowed Origins by Cors//
+
+let allowedOrigins = [
+  'http://localhost:8081',
+  'https://nameless-retreat-07686.herokuapp.com/',
+];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        // If a specific origin isn’t found on the list of allowed origins
+        let message =
+          'The CORS policy for this application doesn’t allow access from origin ' +
+          origin;
+        return callback(new Error(message), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
+
 const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
@@ -33,7 +56,6 @@ mongoose.connect(process.env.CONNECTION_URI, {
 });
 
 //Connnect to MongoDB shell
-// dotenv.config();
 // mongoose.connect('mongodb://localhost:27017/movieApp', {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true,
