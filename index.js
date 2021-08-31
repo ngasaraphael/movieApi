@@ -39,8 +39,8 @@ const Models = require('./model.js');
 //Schemas
 const Movies = Models.Movie;
 const Users = Models.User;
-const Genres = Models.Genre;
-const Directors = Models.Director;
+// const Genres = Models.Genre;
+// const Directors = Models.Director;
 
 //auth route
 const auth = require('./auth');
@@ -95,9 +95,9 @@ app.get('/movies/:Title', async (req, res) => {
   }
 });
 
-//Route to Data about Genre  ****************************************
-app.get('/genres/:genre', (req, res) => {
-  Genres.find({ Genre: req.body.genre })
+//Route to Data about Genre
+app.get('/genres/:name', (req, res) => {
+  Movies.find({ ['Genre.Name']: req.params.name })
     .then((movie) => {
       res.json(movie);
     })
@@ -107,10 +107,12 @@ app.get('/genres/:genre', (req, res) => {
     });
 });
 
-//Route to Data about Director  **************************************
-app.get('/directors/:Name', async (req, res) => {
+//Route to Data about Director
+app.get('/directors/:name', async (req, res) => {
   try {
-    const director = await Directors.findOne({ Name: req.params.Name });
+    const director = await Movies.findOne({
+      ['Director.Name']: req.params.name,
+    });
     res.json(director);
   } catch (err) {
     res.json({ message: 'Info about director could not be accessed' });
