@@ -64,7 +64,7 @@ mongoose.connect(process.env.CONNECTION_URI, {
 app.use(morgan('common'));
 
 //route middleware
-app.use('/user', auth);
+app.use('/', auth);
 
 //static routes
 app.use(express.static('public'));
@@ -119,7 +119,7 @@ app.get('/directors/:name', async (req, res) => {
 });
 
 //get all users
-app.get('/users', async (req, res) => {
+app.get('/users', verify, async (req, res) => {
   try {
     const users = await Users.find();
     res.status(201).json(users);
