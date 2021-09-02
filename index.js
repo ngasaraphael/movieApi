@@ -63,9 +63,6 @@ mongoose.connect(process.env.CONNECTION_URI, {
 //morgan middleware to log details
 app.use(morgan('common'));
 
-// //route middleware
-// app.use('/', auth);
-
 //static routes
 app.use(express.static('public'));
 
@@ -90,11 +87,11 @@ app.get(
 
 //route to Data about single movie route
 app.get(
-  '/movies/:Title',
+  '/movies/:title',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const movie = await Movies.findOne({ Title: req.params.Title });
+      const movie = await Movies.findOne({ Title: req.params.title });
       res.status(201).json(movie);
     } catch (err) {
       res.json({ message: 'Movie could not be accessed' });
@@ -125,7 +122,7 @@ app.get(
   async (req, res) => {
     try {
       const director = await Movies.findOne({
-        ['Director.Name']: req.params.name,
+        'Director.Name': req.params.name,
       });
       res.json(director);
     } catch (err) {
@@ -150,11 +147,11 @@ app.get(
 
 // Get a user by username
 app.get(
-  '/users/:Username',
+  '/users/:username',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const user = await Users.findOne({ username: req.params.Username });
+      const user = await Users.findOne({ username: req.params.username });
       res.json(user);
     } catch (err) {
       res.json({ message: 'User could not be accessed by username' });
@@ -223,13 +220,13 @@ app.patch(
 
 //Route for users to add movies to favorite list
 app.post(
-  '/users/:Username/movies/:MovieID',
+  '/users/:username/movies/:movieID',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     Users.findOneAndUpdate(
-      { username: req.params.Username },
+      { username: req.params.username },
       {
-        $push: { favoriteMovie: req.params.MovieID },
+        $push: { favoriteMovie: req.params.movieID },
       },
       { new: true },
       (err, updatedUser) => {
@@ -246,13 +243,13 @@ app.post(
 
 //Route for users to remove movies from favorite list
 app.delete(
-  '/users/:Username/movies/delete/:MovieID',
+  '/users/:username/movies/delete/:movieID',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     Users.findOneAndUpdate(
-      { username: req.params.Username },
+      { username: req.params.username },
       {
-        $pull: { favoriteMovie: req.params.MovieID },
+        $pull: { favoriteMovie: req.params.movieID },
       },
       { new: true },
       (err, updatedUser) => {
@@ -294,3 +291,6 @@ const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => {
   console.log('Listening on Port ' + port);
 });
+
+//Will delete soon
+//CONNECT_URI=mongodb+srv://ngasaraphael:dudumimi79@contactkeeper.582hb.mongodb.net/movieApp?retryWrites=true&w=majority

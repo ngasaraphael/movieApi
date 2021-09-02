@@ -1,18 +1,3 @@
-// const jwt = require('jsonwebtoken');
-
-// //middleware created and can be added to routes to confirm presence of token(found in header) before given access. ie only loggedin users can access this route
-// module.exports = function (req, res, next) {
-//   const token = req.header('auth-token');
-//   if (!token) return res.status(401).send('Unauthorized');
-//   try {
-//     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-//     req.user = verified;
-//     next();
-//   } catch (err) {
-//     res.status(400).send('Invalid Token');
-//   }
-// };
-
 const passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
   Models = require('./model.js'),
