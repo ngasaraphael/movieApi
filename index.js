@@ -31,22 +31,24 @@ const uuid = require('uuid');
 const dotenv = require('dotenv').config();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-//passport
-const verify = require('./passport');
+// //passport
+// const verify = require('./passport');
 //Schema file
 const Models = require('./model.js');
 //Schemas
 const Movies = Models.Movie;
 const Users = Models.User;
-// const Genres = Models.Genre;
-// const Directors = Models.Director;
-
-//auth route
-const auth = require('./auth');
 
 //bodyParser Middleware for req.param.body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//auth route
+let auth = require('./auth')(app);
+
+//passport
+const passport = require('passport');
+require('./passport');
 
 //Connect to MongoDB Atlass
 mongoose.connect(process.env.CONNECTION_URI, {
@@ -63,8 +65,8 @@ mongoose.connect(process.env.CONNECTION_URI, {
 //morgan middleware to log details
 app.use(morgan('common'));
 
-//route middleware
-app.use('/', auth);
+// //route middleware
+// app.use('/', auth);
 
 //static routes
 app.use(express.static('public'));
@@ -75,14 +77,18 @@ app.get('/', (req, res) => {
 });
 
 // //All movies route
-app.get('/movies', async (req, res) => {
-  try {
-    const movies = await Movies.find();
-    res.status(201).json(movies);
-  } catch (err) {
-    res.json({ message: 'Movies could not be accessed' });
+app.get(
+  '/movies',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const movies = await Movies.find();
+      res.status(201).json(movies);
+    } catch (err) {
+      res.json({ message: 'Movies could not be accessed' });
+    }
   }
-});
+);
 
 //route to Data about single movie route
 app.get('/movies/:Title', async (req, res) => {
@@ -119,7 +125,7 @@ app.get('/directors/:name', async (req, res) => {
 });
 
 //get all users
-app.get('/users', verify, async (req, res) => {
+app.get('/users', async (req, res) => {
   try {
     const users = await Users.find();
     res.status(201).json(users);
@@ -181,10 +187,10 @@ app.post(
 );
 
 //Updating User Info
-app.patch('/users/:postid', verify, async (req, res) => {
+app.patch('/users/:userid', async (req, res) => {
   try {
     const patchedPost = await Users.updateOne(
-      { _id: req.params.postid },
+      { _id: req.params.userid },
       { $set: { username: req.body.username } }
     );
     res.json(patchedPost);
@@ -213,7 +219,7 @@ app.post('/users/:Username/movies/:MovieID', (req, res) => {
 });
 
 //Route for users to remove movies from favorite list
-app.delete('/users/:Username/movies/delete/:MovieID', verify, (req, res) => {
+app.delete('/users/:Username/movies/delete/:MovieID', (req, res) => {
   Users.findOneAndUpdate(
     { username: req.params.Username },
     {
@@ -232,7 +238,7 @@ app.delete('/users/:Username/movies/delete/:MovieID', verify, (req, res) => {
 });
 
 //Route to delete user
-app.delete('/users/:username', verify, async (req, res) => {
+app.delete('/users/:username', async (req, res) => {
   try {
     const deletedUser = await Users.findOneAndRemove({
       username: req.params.username,
@@ -254,5 +260,3 @@ const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => {
   console.log('Listening on Port ' + port);
 });
-
-//mongodb+srv://ngasaraphael:dudumimi79@contactkeeper.582hb.mongodb.net/movieApp?retryWrites=true&w=majority
