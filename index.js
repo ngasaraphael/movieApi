@@ -72,18 +72,14 @@ app.get('/', (req, res) => {
 });
 
 // //All movies route
-app.get(
-  '/movies',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
-    try {
-      const movies = await Movies.find();
-      res.status(201).json(movies);
-    } catch (err) {
-      res.json({ message: 'Movies could not be accessed' });
-    }
+app.get('/movies', async (req, res) => {
+  try {
+    const movies = await Movies.find();
+    res.status(201).json(movies);
+  } catch (err) {
+    res.json({ message: 'Movies could not be accessed' });
   }
-);
+});
 
 //route to Data about single movie route
 app.get(
