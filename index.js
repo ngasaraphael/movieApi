@@ -162,7 +162,7 @@ app.post(
 
     //Hash password with bcrypt
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    let hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     //register new user
     const user = new Users({
@@ -182,13 +182,33 @@ app.post(
 
 //Updating User Info
 app.patch(
-  '/users/:userid',
+  '/users/:username',
   // passport.authenticate('jwt', { session: false }),
+  [
+    check('password', 'Password is required').not().isEmpty(),
+    check('email', 'Email does not appear to be valid').isEmail(),
+  ],
   async (req, res) => {
+    // check the validation object for errors (express validator)
+    let errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     try {
       const patchedPost = await Users.updateOne(
-        { _id: req.params.userid },
-        { $set: { username: req.body.username } }
+        { username: req.params.username },
+        {
+          $set: {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            birthday: req.body.birthday,
+          },
+        },
+
+        { new: true }
       );
       res.json(patchedPost);
     } catch (err) {
