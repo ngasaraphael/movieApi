@@ -217,6 +217,20 @@ app.patch(
   }
 );
 
+//get single movie by id for favoriteMovie list
+app.get(
+  '/movies/favorites/:id',
+  // passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const movie = await Movies.findOne({ _id: req.params.id });
+      res.status(201).json(movie);
+    } catch (err) {
+      res.json({ message: 'Movie could not be accessed' });
+    }
+  }
+);
+
 //Route for users to add movies to favorite list
 app.post(
   '/users/:username/movies/:movieID',
