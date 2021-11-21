@@ -4,7 +4,7 @@ movie api provide details of movies
 #Built With.  
 MERN Tech stack (Frontend built using React library).   
 
-**Node dependencies** 
+**Node dependencies**    
 Express.  
 morgan for logging.  
 bodyParser.  
