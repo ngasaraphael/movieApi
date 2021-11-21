@@ -41,12 +41,14 @@ mongoose.connect(process.env.CONNECTION_URI, {
 //morgan middleware to log details
 app.use(morgan('common'));
 
-//static routes
+//static routes (e.g to documentation.html)
 app.use(express.static('public'));
 
 //Home directory
 app.get('/', (req, res) => {
-  res.send('<h1>welcome to MovieApi</h1>');
+  res.send(
+    '<h2>welcome to MovieApi</h2><p>Find API endpoints at https://nameless-retreat-07686.herokuapp.com/documentation.html </p> '
+  );
 });
 
 /**
